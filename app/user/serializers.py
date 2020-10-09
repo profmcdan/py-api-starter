@@ -32,15 +32,18 @@ class CreateUserSerializer(serializers.ModelSerializer):
                         'last_login': {'read_only': True}}
 
     def validate(self, attrs):
-        email = attrs['email'].lower().strip()
-        if get_user_model().objects.filter(email=email).exists():
-            raise serializers.ValidationError('Email already exists')
-        try:
-            valid = validate_email(attrs['email'])
-            attrs['email'] = valid.email
-            return super().validate(attrs)
-        except EmailNotValidError as e:
-            raise serializers.ValidationError(e)
+        email = attrs.get('email', None)
+        if email:
+            email = attrs['email'].lower().strip()
+            if get_user_model().objects.filter(email=email).exists():
+                raise serializers.ValidationError('Email already exists')
+            try:
+                valid = validate_email(attrs['email'])
+                attrs['email'] = valid.email
+                return super().validate(attrs)
+            except EmailNotValidError as e:
+                raise serializers.ValidationError(e)
+        return super().validate(attrs)
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
@@ -73,7 +76,8 @@ class CustomObtainTokenPairSerializer(TokenObtainPairSerializer):
         token.id = user.id
         token['email'] = user.email
         token['roles'] = user.roles
-        token['fullname'] = user.firstname + ' ' + user.lastname
+        if user.firstname and user.lastname:
+            token['fullname'] = user.firstname + ' ' + user.lastname
         if user.image:
             token['image'] = user.image.url
         token['phone'] = user.phone
