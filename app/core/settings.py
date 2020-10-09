@@ -29,10 +29,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'yc_zvg#_m*$3rw1_ekj_4%n!rw65ev#h*0(7-x^4k8q38@m^wf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get('DEBUG', 1))
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'api.dev.mbnp.tanz-api.com',
-                 '0.0.0.0', 'api.mbnp.prunedge.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', ]
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -102,8 +101,14 @@ LOGOUT_URL = 'rest_framework:logout'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default':  {
+DATABASES = {}
+
+
+if DEBUG == 0:
+    DATABASES['default'] = dj_database_url.config(
+        default=config('DATABASE_URL'))
+else:
+    DATABASES['default'] = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
         "NAME": os.environ.get("POSTGRES_DB", os.path.join(BASE_DIR, "db.sqlite3")),
         "USER": os.environ.get("POSTGRES_USER", "user"),
@@ -114,7 +119,7 @@ DATABASES = {
             'NAME': "prune_test"
         }
     }
-}
+
 
 REDIS_URL = os.getenv('REDIS_URL', "redis://redis:6379")
 
@@ -332,12 +337,13 @@ CELERY_BEAT_SCHEDULE = {
     # },
 }
 
-sentry_sdk.init(
-    dsn=os.environ.get('SENTRY_DSN', None),
-    integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
+if DEBUG == 0:
+    sentry_sdk.init(
+        dsn=os.environ.get('SENTRY_DSN', None),
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
 
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
-)
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True
+    )
