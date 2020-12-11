@@ -16,33 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-# from app.notifications.views import home
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title=" API",
-        default_version='v1',
-        description=" API",
-        terms_of_service="https://dan.com/policies/terms/",
-        contact=openapi.Contact(email="danielale9291@gmail.com"),
-        license=openapi.License(name="BSD License"),
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 
 urlpatterns = [
-    url(r'^api/v1/doc(?P<format>\.json|\.yaml)$', schema_view.without_ui(
-        cache_timeout=0), name='schema-json'),
-    url(r'^api/v1/doc/$', schema_view.with_ui('swagger',
-                                              cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^api/v1/redoc/$', schema_view.with_ui('redoc',
-                                                cache_timeout=0), name='schema-redoc'),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/v1/doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/v1/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('api/v1/api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
     path('api/v1/auth/', include('user.urls')),
+    path('api/v1/books/', include('books.urls')),
 ]

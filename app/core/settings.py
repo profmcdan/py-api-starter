@@ -21,7 +21,6 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -31,7 +30,7 @@ SECRET_KEY = 'yc_zvg#_m*$3rw1_ekj_4%n!rw65ev#h*0(7-x^4k8q38@m^wf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get('DEBUG', 1))
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', ]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'api.oyidentity.tanz-api.com']
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -50,10 +49,13 @@ INSTALLED_APPS = [
     'storages',
     'rest_framework',
     'rest_framework.authtoken',
-    'drf_yasg',
+    # 'drf_yasg',
+    'drf_spectacular',
     'django_filters',
     'import_export',
     'user',
+    'attendance',
+    'books',
 ]
 
 MIDDLEWARE = [
@@ -102,7 +104,6 @@ LOGOUT_URL = 'rest_framework:logout'
 
 DATABASES = {}
 
-
 if DEBUG == 0:
     DATABASES['default'] = dj_database_url.config(
         default=config('DATABASE_URL'))
@@ -119,7 +120,6 @@ else:
         }
     }
 
-
 REDIS_URL = os.getenv('REDIS_URL', "redis://redis:6379")
 
 CACHES = {
@@ -132,7 +132,7 @@ CACHES = {
     }
 }
 
-CACHE_TTL = 60 * 15
+CACHE_TTL = 60 * 1
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
@@ -155,7 +155,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -170,20 +169,20 @@ USE_L10N = False
 USE_TZ = True
 
 DATE_INPUT_FORMATS = [
-    '%d/%m/%Y', '%d/%m/%y',             # '10/02/2020', '10/02/20'
+    '%d/%m/%Y', '%d/%m/%y',  # '10/02/2020', '10/02/20'
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
-    '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-    '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-    '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-    '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+    '%b %d %Y', '%b %d, %Y',  # 'Oct 25 2006', 'Oct 25, 2006'
+    '%d %b %Y', '%d %b, %Y',  # '25 Oct 2006', '25 Oct, 2006'
+    '%B %d %Y', '%B %d, %Y',  # 'October 25 2006', 'October 25, 2006'
+    '%d %B %Y', '%d %B, %Y',  # '25 October 2006', '25 October, 2006'
 ]
-
 
 REST_FRAMEWORK = {
     #    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'core.pagination.CustomPagination',
     'PAGE_SIZE': 10,
-    'DATE_INPUT_FORMATS': ["%d/%m/%Y", ],
+    # 'DATE_INPUT_FORMATS': ["%d/%m/%Y", ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
@@ -193,12 +192,12 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
 }
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_TMP = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/oyidentity')
+STATIC_TMP = os.path.join(BASE_DIR, 'static/oyidentity')
 os.makedirs(STATIC_TMP, exist_ok=True)
 os.makedirs(STATIC_ROOT, exist_ok=True)
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/oyidentity/'
 
 # AWS CONFIG
 # to make sure all your files gives read only access to the files
@@ -212,8 +211,8 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-AWS_LOCATION = 'static'
-#AWS_QUERYSTRING_EXPIRE = 10
+AWS_LOCATION = 'static/oyidentity'
+# AWS_QUERYSTRING_EXPIRE = 10
 # s3 private media settings
 PRIVATE_MEDIA_LOCATION = 'private'
 PRIVATE_FILE_STORAGE = 'core.storage_backends.PrivateMediaStorage'
@@ -224,7 +223,7 @@ PRIVATE_FILE_STORAGE = 'core.storage_backends.PrivateMediaStorage'
 
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, AWS_LOCATION),
 ]
 
 STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
@@ -232,7 +231,6 @@ STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 DEFAULT_FILE_STORAGE = 'core.storage_backends.MediaStorage'
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
@@ -260,7 +258,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=14),
 }
 
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -281,12 +278,19 @@ LOGGING = {
 }
 
 # Email Settings
-EMAIL_FROM = os.environ.get('EMAIL_FROM')
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
+# EMAIL_FROM = os.environ.get('EMAIL_FROM')
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'apikey'
+# EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+
+EMAIL_FROM = os.environ.get('SMTP_USER')
+EMAIL_HOST = os.environ.get('SMTP_HOST')
+EMAIL_PORT = os.environ.get('SMTP_PORT')
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+EMAIL_HOST_USER = os.environ.get('SMTP_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('SMTP_PASSWORD')
 
 # SMS Settings
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", None)
@@ -305,12 +309,10 @@ SWAGGER_SETTINGS = {
     },
 }
 
-
 TOKEN_LIFESPAN = 24  # hours
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379")
 FLOWER_BASIC_AUTH = os.environ.get('FLOWER_BASIC_AUTH')
-
 
 CHANNEL_LAYERS = {
     'default': {
@@ -321,7 +323,6 @@ CHANNEL_LAYERS = {
         # 'ROUTING': 'core'
     },
 }
-
 
 # REDIS_DEFAULT_CONNECTION_POOL = redis.ConnectionPool.from_url(REDIS_URL)
 
@@ -346,3 +347,20 @@ if DEBUG == 0:
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True
     )
+
+SPECTACULAR_SETTINGS = {
+    'SCHEMA_PATH_PREFIX': r'/api/v1',
+    'DEFAULT_GENERATOR_CLASS': 'drf_spectacular.generators.SchemaGenerator',
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+        "displayRequestDuration": True
+    },
+    'TITLE': 'Application API',
+    'DESCRIPTION': 'API Doc',
+    'VERSION': '1.0.0',
+    'LICENCE': {'name': 'BSD License'},
+    'CONTACT': {'name': 'Daniel Ale', 'email': 'daniel.ale@prunedge.com'},
+}
