@@ -35,8 +35,6 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'api.oyidentity.tanz-api.c
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -278,13 +276,6 @@ LOGGING = {
 }
 
 # Email Settings
-# EMAIL_FROM = os.environ.get('EMAIL_FROM')
-# EMAIL_HOST = 'smtp.sendgrid.net'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'apikey'
-# EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
-
 EMAIL_FROM = os.environ.get('SMTP_USER')
 EMAIL_HOST = os.environ.get('SMTP_HOST')
 EMAIL_PORT = os.environ.get('SMTP_PORT')
