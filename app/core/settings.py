@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'storages',
     'rest_framework',
     'rest_framework.authtoken',
-    # 'drf_yasg',
     'drf_spectacular',
     'django_filters',
     'import_export',
