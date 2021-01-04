@@ -36,13 +36,13 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
     'corsheaders',
     'storages',
     'rest_framework',
@@ -51,8 +51,7 @@ INSTALLED_APPS = [
     'django_filters',
     'import_export',
     'user',
-    'attendance',
-    'books',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -90,7 +89,8 @@ TEMPLATES = [
 # CUSTOM USER MODEL
 AUTH_USER_MODEL = "user.User"
 WSGI_APPLICATION = 'core.wsgi.application'
-ASGI_APPLICATION = 'core.routing.application'
+ASGI_APPLICATION = 'core.asgi.application'
+
 CORS_ALLOW_ALL_ORIGINS = True
 
 LOGIN_URL = 'rest_framework:login'
@@ -342,15 +342,26 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': r'/api/v1',
     'DEFAULT_GENERATOR_CLASS': 'drf_spectacular.generators.SchemaGenerator',
     'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
+    'COMPONENT_SPLIT_PATCH': True,
+    'COMPONENT_SPLIT_REQUEST': True,
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
         "persistAuthorization": True,
         "displayOperationId": True,
         "displayRequestDuration": True
     },
+    'UPLOADED_FILES_USE_URL': True,
     'TITLE': 'Application API',
     'DESCRIPTION': 'API Doc',
     'VERSION': '1.0.0',
     'LICENCE': {'name': 'BSD License'},
     'CONTACT': {'name': 'Daniel Ale', 'email': 'daniel.ale@prunedge.com'},
+
+    # Oauth2 related settings. used for example by django-oauth2-toolkit.
+    # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md#oauth-flows-object
+    'OAUTH2_FLOWS': [],
+    'OAUTH2_AUTHORIZATION_URL': None,
+    'OAUTH2_TOKEN_URL': None,
+    'OAUTH2_REFRESH_URL': None,
+    'OAUTH2_SCOPES': None,
 }
