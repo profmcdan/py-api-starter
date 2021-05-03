@@ -1,4 +1,4 @@
-FROM jwilder/nginx-proxy
+FROM jwilder/nginx-proxy:latest
 COPY ./docker/prod/nginx/vhost.d/default /etc/nginx/vhost.d/default
 COPY ./docker/prod/nginx/custom.conf /etc/nginx/conf.d/custom.conf
 
