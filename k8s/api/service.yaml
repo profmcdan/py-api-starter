@@ -4,9 +4,9 @@ metadata:
   name: api-service
 spec:
   selector:
-    app: api-container
+    pod: api
   ports:
   - protocol: TCP
-    port: 8000
+    port: 80
     targetPort: 8000
-  type: NodePort
+  type: LoadBalancer

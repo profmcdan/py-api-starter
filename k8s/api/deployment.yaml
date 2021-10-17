@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api-container
+      app: api
   template:
     metadata:
       labels:
-        app: api-container
+        app: api
     spec:
       containers:
         - name: starter-api
