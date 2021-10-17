@@ -30,7 +30,7 @@ SECRET_KEY = 'yc_zvg#_m*$3rw1_ekj_4%n!rw65ev#h*0(7-x^4k8q38@m^wf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get('DEBUG', 1))
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'api.oyidentity.tanz-api.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -116,20 +116,6 @@ else:
             'NAME': "prune_test"
         }
     }
-
-REDIS_URL = os.getenv('REDIS_URL', "redis://redis:6379")
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
-
-CACHE_TTL = 60 * 1
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
@@ -300,10 +286,30 @@ SWAGGER_SETTINGS = {
 }
 
 TOKEN_LIFESPAN = 24  # hours
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379")
-FLOWER_BASIC_AUTH = os.environ.get('FLOWER_BASIC_AUTH')
+REDIS_URL = "redis://{host}:{port}/1".format(
+    host=os.getenv('REDIS_HOST', 'localhost'),
+    port=os.getenv('REDIS_PORT', '6379')
+)
 
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+
+FLOWER_BASIC_AUTH = os.environ.get('FLOWER_BASIC_AUTH')
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "KEY_PREFIX": "api_starter"
+    }
+}
+
+CACHE_TTL = 60 * 1
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',

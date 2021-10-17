@@ -1,24 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: celery-worker
   labels:
-    app: api
+    deployment: celery-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api-container
+      pod: celery-worker
   template:
     metadata:
       labels:
-        app: api-container
+        pod: celery-worker
     spec:
       containers:
-        - name: starter-api
+        - name: celery-worker
           image: profmcdan/django-starter-api:v0
-          ports:
-            - containerPort: 8000
+          command: ['celery', '-A', 'core', 'worker', '-l', 'INFO']
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -37,4 +36,3 @@ spec:
 
             - name: REDIS_HOST
               value: redis-service
-

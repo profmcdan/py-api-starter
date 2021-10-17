@@ -64,6 +64,22 @@ kubectl delete -f db/volume.yaml
 
 Use the service name in the database host.
 
+## Run Redis
+```
+kubectl apply -f redis/deployment.yaml
+kubectl apply -f redis/service.yaml
+
+```
+
+## TL;DR;
+
+```
+$ kubectl apply -f db/  # See dashboard in browser
+$ kubectl apply -f redis/
+$ kubectl apply -f api/
+$ kubectl apply -f celery/
+$ kubectl apply -f flower/
+```
 
 
 
