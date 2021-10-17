@@ -21,12 +21,50 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 
 ## Run Deployment 
 ```
-kubectl apply -f deployment-api.yaml
+kubectl apply -f api/deployment-api.yaml
 kubectl get deployments
 kubectl get pods 
-kubectl delete -f deployment-api.yaml
+kubectl delete -f api/deployment-api.yaml
 ```
 ## Run Service 
-```kubectl delete -f deployment-api.yaml```
+```
+kubectl delete -f api/service-api.yaml
+kubectl get svc
+kubectl delete -f api/service-api.yaml
+```
+
+## Run Database on Kubernetes
+```
+kubectl apply -f db/volume.yaml 
+kubectl apply -f db/volume_claim.yaml 
+kubectl apply -f db/secrets.yaml 
+kubectl apply -f db/deployment.yaml
+kubectl apply -f db/service.yaml
+```
+
+In order to create the database credentials: 
+```
+echo -n "admin" | base64
+echo -n "StrongPass293word" | base64
+```
+
+```
+kubectl get pv
+kubectl get pvc
+```
+
+Delete these resources
+```
+kubectl delete -f db/service.yaml
+kubectl delete -f db/deployment.yaml
+kubectl delete -f db/secrets.yaml 
+kubectl delete -f db/volume_claim.yaml 
+kubectl delete -f db/volume.yaml 
+```
+
+Use the service name in the database host.
+
+
+
 
 
