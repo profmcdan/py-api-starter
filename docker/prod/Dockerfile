@@ -1,6 +1,7 @@
 # Pull official base image 
-FROM python:3.8-slim
+FROM python:3.9-slim
 
+LABEL maintainer="danielale9291@gmail.com"
 # Set working directory
 WORKDIR /app
 
@@ -17,10 +18,10 @@ COPY ./app/requirements ./requirements
 # Install dependencies
 COPY ./app/requirements ./requirements
 RUN pip install --upgrade pip
-RUN pip install -r ./requirements/prod.txt
+RUN pip install -r ./requirements/prod.txt --use-deprecated=legacy-resolver
 
 # Copy entrypoint.sh
-COPY ./docker/dev/entrypoint.sh /entrypoint.sh
+COPY ./docker/prod/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 
