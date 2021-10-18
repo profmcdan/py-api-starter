@@ -1,3 +1,6 @@
+# README
+### Note: Add a secrets folder in k8s as it has been git-ignored 
+
 ## Build docker image 
 
 ```docker build . -t profmcdan/django-starter-api:v0 -f docker/prod/Dockerfile```
