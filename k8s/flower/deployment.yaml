@@ -21,8 +21,10 @@ spec:
         ports:
           - containerPort: 5555
         env:
-            - name: REDIS_HOST
-              value: redis-service
+          - name: REDIS_HOST
+            value: redis-service
+          - name: FLOWER_BASIC_AUTH
+            value: admin:useradmin
         resources:
           limits:
             cpu: 100m

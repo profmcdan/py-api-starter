@@ -74,6 +74,7 @@ kubectl apply -f redis/service.yaml
 ## TL;DR;
 
 ```
+$ kubectl apply -f secrets/
 $ kubectl apply -f db/  # See dashboard in browser
 $ kubectl apply -f redis/
 $ kubectl apply -f api/

@@ -107,11 +107,11 @@ if DEBUG == 0:
 else:
     DATABASES['default'] = {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("POSTGRES_DB", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("POSTGRES_USER", "user"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
-        "HOST": os.environ.get("SQL_HOST", "localhost"),
-        "PORT": os.environ.get("SQL_PORT", "5432"),
+        "NAME": os.environ.get("DB_NAME", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
         "TEST": {
             'NAME': "prune_test"
         }
@@ -175,12 +175,13 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
 }
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/oyidentity')
-STATIC_TMP = os.path.join(BASE_DIR, 'static/oyidentity')
+APP_NAME = os.getenv('APP_NAME', 'app')
+STATIC_ROOT = os.path.join(BASE_DIR, f'staticfiles/{APP_NAME}')
+STATIC_TMP = os.path.join(BASE_DIR, f'static/{APP_NAME}')
 os.makedirs(STATIC_TMP, exist_ok=True)
 os.makedirs(STATIC_ROOT, exist_ok=True)
 
-STATIC_URL = '/static/oyidentity/'
+STATIC_URL = f'/static/{APP_NAME}/'
 
 # AWS CONFIG
 # to make sure all your files gives read only access to the files
@@ -194,7 +195,7 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
-AWS_LOCATION = 'static/oyidentity'
+AWS_LOCATION = f'static/{APP_NAME}'
 # AWS_QUERYSTRING_EXPIRE = 10
 # s3 private media settings
 PRIVATE_MEDIA_LOCATION = 'private'
@@ -261,12 +262,14 @@ LOGGING = {
 }
 
 # Email Settings
-EMAIL_FROM = os.environ.get('SMTP_USER')
-EMAIL_HOST = os.environ.get('SMTP_HOST')
-EMAIL_PORT = os.environ.get('SMTP_PORT')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+
+EMAIL_FROM = os.environ.get('SENDER_EMAIL')
+EMAIL_HOST = os.environ.get('SMTP_HOST', 'smtp.sendgrid.net')
+EMAIL_HOST_USER = 'apikey'  # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('SMTP_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('SMTP_PASSWORD')
 
 # SMS Settings
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", None)
