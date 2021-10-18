@@ -33,7 +33,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: postgres-credentials
-                  value: db_name
+                  key: db_name
 
           ports:
             - containerPort: 5432
