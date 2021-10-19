@@ -17,6 +17,7 @@ spec:
       containers:
         - name: starter-api
           image: profmcdan/django-starter-api:v0
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           env:
