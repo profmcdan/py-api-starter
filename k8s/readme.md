@@ -85,6 +85,11 @@ $ kubectl apply -f celery/
 $ kubectl apply -f flower/
 ```
 
+## Enable Ingress Controller 
+if you are using minikube then run the following:
+```
+minikube addons list
+minikube addons enable ingress
+minikube tunnel
 
-
-
+```
