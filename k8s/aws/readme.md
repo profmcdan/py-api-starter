@@ -1,6 +1,6 @@
 # Setup AWS KOPS
 
-Set necessary env variable
+## Set necessary env variable and create group
 
 ```bash
 AWS_ACCESS_KEY_ID=xxx
