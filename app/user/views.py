@@ -18,7 +18,7 @@ from django.utils.crypto import get_random_string
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.cache import cache
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from .models import User, Token
+from .models import CustomUser, Token
 from .permissions import IsAdmin, IsRegularUser, IsSuperAdmin
 from .serializers import (CreateUserSerializer, ListUserSerializer, AuthTokenSerializer, CustomObtainTokenPairSerializer,
                           VerifyTokenSerializer, InitializePasswordResetSerializer, CreatePasswordSerializer)

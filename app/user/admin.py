@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext as _
-from .models import User, Token
+from .models import CustomUser, Token
 
 
-class UserAdmin(BaseUserAdmin):
+class CustomUserAdmin(BaseUserAdmin):
     ordering = ['email']
     list_display = ['email', 'lastname', 'firstname', 'roles']
     search_fields = ('id', 'email', 'lastname', 'firstname', 'phone', 'roles')
@@ -26,5 +26,5 @@ class UserAdmin(BaseUserAdmin):
     )
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Token)

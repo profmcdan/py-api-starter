@@ -41,3 +41,5 @@ drf-spectacular==0.17.3
 Faker==4.17.1
 selenium==3.141.0
 django-health-check==3.14.3
+django-prometheus==2.1.0
+prometheus-client==0.12.0

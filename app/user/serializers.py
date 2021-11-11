@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from email_validator import validate_email, EmailNotValidError
-from .models import Token, User
+from .models import Token, CustomUser
 from .tasks import send_new_user_email, send_password_reset_email
 
 
@@ -46,7 +46,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        user = CustomUser.objects.create_user(**validated_data)
         token, _ = Token.objects.update_or_create(
             user=user, token_type='ACCOUNT_VERIFICATION',
             defaults={'user': user, 'token_type': 'ACCOUNT_VERIFICATION', 'token': get_random_string(120)})

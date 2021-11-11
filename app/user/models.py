@@ -1,6 +1,7 @@
 
 from django.core.files import File
 from urllib.request import urlretrieve
+from django_prometheus.models import ExportModelOperationsMixin
 import uuid
 from datetime import datetime
 from django.db import models
@@ -38,7 +39,7 @@ def default_role():
     return ['REGULAR']
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class CustomUser(ExportModelOperationsMixin('user'), AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
         _('email address'), null=True, blank=True, unique=True)
