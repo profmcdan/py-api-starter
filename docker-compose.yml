@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:14.1-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_rms_data:/var/lib/postgresql/data
     env_file:
       - ./.env
     ports:
@@ -19,12 +19,12 @@ services:
     build:
       context: .
       dockerfile: docker/dev/Dockerfile
-    image: profmcdan/api-starter
-    command: python manage.py runserver 0.0.0.0:8000
+    image: profmcdan/rms-api
+    command: python manage.py runserver 0.0.0.0:10007
     volumes:
       - ./app:/app
     ports:
-      - "8000:8000"
+      - "10007:10007"
     env_file:
       - ./.env
     restart: unless-stopped
@@ -110,7 +110,6 @@ services:
 
   grafana:
     image: grafana/grafana:7.1.5-ubuntu
-    container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -127,6 +126,6 @@ services:
       - api
 
 volumes:
-  postgres_data: ~
+  postgres_rms_data: ~
   grafana_data: { }
   prom_data: { }
