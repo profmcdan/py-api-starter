@@ -16,3 +16,4 @@ celerybeat.pid
 app/logs/debug.log
 app/logs/celery.log
 .env
+/k8s/secrets/
