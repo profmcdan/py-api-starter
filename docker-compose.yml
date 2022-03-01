@@ -1,6 +1,20 @@
 version: "3.7"
 
 services:
+  db:
+    image: postgres:14.1-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   api: &api
     build:
       context: .
@@ -13,28 +27,24 @@ services:
       - "8000:8000"
     env_file:
       - ./.env
+    restart: unless-stopped
     depends_on:
       - redis
       - db
 
-  db:
-    image: postgres:12.1-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: bitnami/redis:latest
     env_file:
       - ./.env
     ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:alpine
-    ports:
       - "6379:6379"
+#    volumes:
+#      - ./redis-data:/bitnami/redis/data
 
   celery:
     <<: *api
-    command: celery worker --app=core --loglevel=info --logfile=logs/celery.log
-    ports: []
+    command: celery -A core worker --loglevel=info --logfile=logs/celery.log
+    ports: [ ]
     volumes:
       - ./app:/app
     env_file:
@@ -46,7 +56,7 @@ services:
   celery-beat:
     <<: *api
     command: celery -A core beat -l info
-    ports: []
+    ports: [ ]
     volumes:
       - ./app:/app
     env_file:
@@ -57,9 +67,9 @@ services:
 
   dashboard:
     <<: *api
-    command: flower -A core --port=5555 --broker=redis://redis:6379/0
+    command: celery --broker=${REDIS_URL} flower --port=5555
     ports:
-      - 5555:5555
+      - "5555:5555"
     env_file:
       - ./.env
     depends_on:
@@ -85,5 +95,38 @@ services:
     depends_on:
       - api
 
+  prometheus:
+    image: prom/prometheus:v2.14.0
+    volumes:
+      - prom_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:7.1.5-ubuntu
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    labels:
+      org.label-schema.group: "monitoring"
+    depends_on:
+      - api
+
 volumes:
   postgres_data: ~
+  grafana_data: { }
+  prom_data: { }
