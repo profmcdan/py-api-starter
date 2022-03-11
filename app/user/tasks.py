@@ -4,9 +4,10 @@ from django.conf import settings
 from django.template.loader import get_template
 from django.core.management import call_command
 from .utils import send_email
+from core.celery import APP
 
 
-@shared_task
+@APP.task()
 def send_new_user_email(email_data):
     html_template = get_template('emails/new_user_welcome_template.html')
     text_template = get_template('emails/new_user_welcome_template.txt')
@@ -16,7 +17,7 @@ def send_new_user_email(email_data):
                email_data['email'], html_alternative, text_alternative)
 
 
-@shared_task
+@APP.task()
 def send_registration_email(email_data):
     html_template = get_template(
         'emails/account_verification_template.html')
@@ -28,7 +29,7 @@ def send_registration_email(email_data):
                email_data['email'], html_alternative, text_alternative)
 
 
-@shared_task
+@APP.task()
 def send_password_reset_email(email_data):
     html_template = get_template('emails/password_reset_template.html')
     text_template = get_template('emails/password_reset_template.txt')
