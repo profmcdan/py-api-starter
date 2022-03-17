@@ -28,10 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-0$i$ikc--@@!n7z8dr#yb%d5+m@qzn+&q@#bqsr9qe!jskfj16'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", 1))
 
 ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "localhost", "api", "api.swiftjet.prunedge.org"]
 INTERNAL_IPS = ["127.0.0.1"]
@@ -128,12 +128,12 @@ if DEBUG == 0:
         default=config('DATABASE_URL'))
 else:
     DATABASES['default'] = {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("POSTGRES_DB",  BASE_DIR / 'db.sqlite3'),
+        "ENGINE": os.environ.get("SQL_ENGINE"),
+        "NAME": os.environ.get("POSTGRES_DB"),
         "USER": os.environ.get("POSTGRES_USER"),
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": os.environ.get("SQL_HOST"),
-        "PORT": os.environ.get("SQL_PORT", "5432"),
+        "PORT": os.environ.get("SQL_PORT"),
         "TEST": {
             'NAME': "prune_test"
         }
@@ -197,40 +197,38 @@ REST_FRAMEWORK = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-APP_NAME = os.getenv('APP_NAME', 'app')
+APP_NAME = os.getenv('APP_NAME')
 STATIC_ROOT = os.path.join(BASE_DIR, f'staticfiles/{APP_NAME}')
 STATIC_TMP = os.path.join(BASE_DIR, f'static/{APP_NAME}')
 os.makedirs(STATIC_TMP, exist_ok=True)
 os.makedirs(STATIC_ROOT, exist_ok=True)
 
-STATIC_URL = f'/static/{APP_NAME}/'
-
 # AWS CONFIG
 # to make sure all your files gives read only access to the files
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'core.storage_backends.MediaStorage'
+PRIVATE_MEDIA_LOCATION = 'private'
+PRIVATE_FILE_STORAGE = 'core.storage_backends.PrivateMediaStorage'
+
 AWS_DEFAULT_ACL = "public-read"
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
 AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY_AWS')
 AWS_SECRET_ACCESS_KEY = os.environ.get('ACCESS_SECRET_AWS')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('ACCESS_BUCKET_NAME_AWS')
-AWS_S3_SIGNATURE_VERSION = 's3v4'
-AWS_S3_REGION_NAME = 'eu-west-2'
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 AWS_LOCATION = f'static/{APP_NAME}'
-# AWS_QUERYSTRING_EXPIRE = 10
-# s3 private media settings
-PRIVATE_MEDIA_LOCATION = 'private'
-PRIVATE_FILE_STORAGE = 'core.storage_backends.PrivateMediaStorage'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
 STATICFILES_DIRS = [
     BASE_DIR / AWS_LOCATION,
 ]
 
-STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
-
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-DEFAULT_FILE_STORAGE = 'core.storage_backends.MediaStorage'
+STATIC_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+STATIC_ROOT = 'static/'
 
 
 LOGGING = {
@@ -345,8 +343,8 @@ SPECTACULAR_SETTINGS = {
         "displayRequestDuration": True
     },
     'UPLOADED_FILES_USE_URL': True,
-    'TITLE': 'Application API',
-    'DESCRIPTION': 'RMS API Doc',
+    'TITLE': 'Prowoks Application API',
+    'DESCRIPTION': 'Prowoks API Doc',
     'VERSION': '1.0.0',
     'LICENCE': {'name': 'BSD License'},
     'CONTACT': {'name': 'Daniel Ale', 'email': 'daniel.ale@prunedge.com'},
