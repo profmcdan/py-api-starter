@@ -33,7 +33,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", 1))
 
-ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "localhost", "api", "api.swiftjet.prunedge.org"]
+ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "localhost", "api"]
 INTERNAL_IPS = ["127.0.0.1"]
 if DEBUG:
     import os  # only if you haven't already imported this
@@ -58,16 +58,6 @@ INSTALLED_APPS = [
     'storages',
     'django_filters',
     'import_export',
-    'health_check',                             # required
-    'health_check.db',                          # stock Django health checkers
-    'health_check.cache',
-    'health_check.storage',
-    'health_check.contrib.migrations',
-    'health_check.contrib.celery',              # requires celery
-    'health_check.contrib.celery_ping',         # requires celery
-    'health_check.contrib.psutil',              # disk and memory utilization; requires psutil
-    'health_check.contrib.s3boto3_storage',
-    'health_check.contrib.redis',
     'debug_toolbar',
     'drf_spectacular',
     'core.celery.CeleryConfig',
@@ -77,7 +67,6 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "user.User"
 
 MIDDLEWARE = [
-    # 'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -88,7 +77,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -121,23 +109,9 @@ LOGOUT_URL = 'rest_framework:logout'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {}
-
-if DEBUG == 0:
-    DATABASES['default'] = dj_database_url.config(
-        default=config('DATABASE_URL'))
-else:
-    DATABASES['default'] = {
-        "ENGINE": os.environ.get("SQL_ENGINE"),
-        "NAME": os.environ.get("POSTGRES_DB"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": os.environ.get("SQL_HOST"),
-        "PORT": os.environ.get("SQL_PORT"),
-        "TEST": {
-            'NAME': "prune_test"
-        }
-    }
+DATABASES = {
+    "default" : dj_database_url.config(default=config('DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
