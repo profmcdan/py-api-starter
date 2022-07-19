@@ -23,7 +23,6 @@ from sentry_sdk.integrations.django import DjangoIntegration
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -38,6 +37,7 @@ INTERNAL_IPS = ["127.0.0.1"]
 if DEBUG:
     import os  # only if you haven't already imported this
     import socket  # only if you haven't already imported this
+
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[:-1] + '1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
 
@@ -110,7 +110,7 @@ LOGOUT_URL = 'rest_framework:logout'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    "default" : dj_database_url.config(default=config('DATABASE_URL'))
+    "default": dj_database_url.config(default=config('DATABASE_URL'))
 }
 
 # Password validation
@@ -130,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -166,7 +165,6 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     # 'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
 }
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -204,7 +202,6 @@ STATICFILES_DIRS = [
 STATIC_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 STATIC_ROOT = 'static/'
 
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -238,7 +235,6 @@ TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", None)
 TWILIO_NUMBER = 'OYO-EOC'  # os.environ.get("TWILIO_NUMBER")
 
 CLIENT_URL = os.environ.get('CLIENT_URL')
-
 
 TOKEN_LIFESPAN = 24  # hours
 # REDIS_URL = "redis://{host}:{port}".format(
@@ -332,7 +328,6 @@ SPECTACULAR_SETTINGS = {
     'OAUTH2_SCOPES': None,
 }
 
-
 if DEBUG == 0:
     sentry_sdk.init(
         dsn=os.environ.get('SENTRY_DSN', None),
@@ -343,7 +338,6 @@ if DEBUG == 0:
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True
     )
-
 
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
